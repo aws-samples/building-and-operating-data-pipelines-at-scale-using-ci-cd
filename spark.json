@@ -1,0 +1,108 @@
+{
+  "configs": {
+    "sparkConfig": {
+      "spark.sql.files.maxRecordsPerFile": "10000000",
+      "spark.sql.files.maxPartitionBytes": "134217728"
+    },
+    "thresholdLimit": "30%",
+    "duplicateRunCheck": "true",
+    "s3TempPath": "<s3 path where checkpoints can be stored>",
+    "archiveInputFile": "<true|false>",
+    "archiveS3Path": "<requires s3 path if archiveInputFile is true>",
+    "deleteSourceAfterArchival": "<true|false>",
+    "phase_1": {
+      "input_data": {
+        "dataSource": "<aws-s3|database|sftp|local>",
+        "dataFrameName": "<temporary view name>",
+        "fileProperties": {
+          "header": "<true|false>",
+          "fileFormat": "<csv|parquet|orc|json|xml|excel|text|deltalake>"
+        },
+        "dataMapping": "true",
+        "metadataPath": "<s3 path|local path>",
+        "selectColumns": []
+      }
+    },
+    "pre_execution_steps": {
+      "junkCharacterRemoval": "false",
+      "scriptExecutions": [
+	    "<bash commands if any>"
+      ]
+    },
+    "additional_input_read": [
+      {
+        "dataSource": "<aws-s3|database|sftp|local>",
+        "tableName": "<schema.tableName>",
+        "tableQuery": "<SQL Query| absolute SQL file path (s3|local)>"
+      }
+    ]
+  },
+  "phase_2": {
+    "data_validation_required": "<true|false>",
+    "data_validations": {
+      "nullValueValidation": "<true|false>",
+      "nullValueCheck": {
+        "primaryKeys": []
+      },
+      "duplicateRecordValidation": "<true|false>",
+      "duplicateRecordCheck": {
+        "primaryKeys": [],
+        "orderByCols": []
+      }
+    },
+    “data_transformation_required": "<true|false>",
+    "data_transformations": [
+      {
+        "functionName": "<Transformation Description>",
+        "sqlQuery": "<Spark SQL Query| sql file path (s3|local)>",
+        "outputDFName": "<temporary view name>"
+      },
+      {
+        "functionName": "<Transformation Description>",
+        "sqlQuery": "<Spark SQL Query| sql file path (s3|local)>",
+        "outputDFName": "<temporary view name>"
+      }
+    ],
+    "transformed_data_count_validation":"<true|false>"
+  },
+  "phase_3": {
+    "target_record_insert": [
+      {
+        "dataTarget": "<aws-s3|database|sftp|local>",
+        "dataFrameName": "<outputDFName from transformation phase>",
+        "loadType": "<simpleInsert|scdType2Insert|truncateInsert>",
+        "tableName": "<schema.tableName if dataTarget is database>",
+        "outputDataProperties": {
+          "savemode": "",
+          "singleFile": "false",
+          "outputFileNamePrefix": "<file name prefix if singleFile>"
+        },
+        "reconciliation": "true"
+      },
+      {
+        "fileTarget": "<aws-s3|database|sftp|local>",
+        "targetS3Location": "<s3 path if fileTarget is aws-s3>",
+        "sftpServerName": "<sftp server host if filetarget is sftp>",
+        "remoteDirPath": "<sftp path if fileTarget is sftp>",
+        "dataFrameName": "<outputDFName from transformation phase>",
+        "outputFileProperties": {
+          "singleFile": "<true|false>",
+          "header": "<true|false>",
+          "savemode": "<overwrite|append|scd2>",
+          "fileFormat": "<csv|parquet|orc|json|xml|excel|text|deltalake>",
+          "compression": "<gzip|snappy>"
+        }
+      }
+    ],
+    "ErrorRecordInsert": {
+      "fileTarget": "<S3|Database>",
+      "targetS3Location": "S3 path if fileTarget is S3",
+      "tableName": "table name if fileTarget is Database"
+    },
+    "PostExecutionSteps": {
+      "scriptExecutions": [
+        "<bash commands if any>"
+      ]
+    }
+  }
+}
