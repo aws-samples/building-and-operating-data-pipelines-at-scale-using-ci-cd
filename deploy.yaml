@@ -1,0 +1,21 @@
+cluster:
+  useEMRInstanceFleet: "true"
+  spotInstanceCores: 32
+  onDemandInstanceCores: 16
+  useSpotCore: "true"
+  jar: "<s3 jar path>"
+  conf: "<Config json s3 path>"
+
+schedule:
+  state: "<pause|unpause>"
+  concurrency: 4
+  startdate: "2020-01-01 00:00"
+  cron: "0 12 * * 1-5"
+
+deploy:
+  executorMemory: "20g"
+  driverMemory: "20g"
+  executorCores: 7
+  maximumRetries: 3
+  name: "<dag-name>"
+  runnerClass: "<executable main class from jar>"
