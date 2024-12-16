@@ -50,7 +50,7 @@
         "orderByCols": []
       }
     },
-    “data_transformation_required": "<true|false>",
+    "data_transformation_required": "<true|false>",
     "data_transformations": [
       {
         "functionName": "<Transformation Description>",
